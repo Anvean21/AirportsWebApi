@@ -1,5 +1,6 @@
 ﻿using Airport.Domain.Core.Entities;
 using Airport.Domain.Core.Intefaces;
+using Airport.Domain.Core.Models;
 using Airport.Domain.Core.Specification;
 using Airport.Infastructure.Bussines.Interfaces;
 using System;
@@ -40,14 +41,14 @@ namespace Airport.Infastructure.Bussines.Services
             return await cityRepository.FindAsync(id);
         }
 
-        public async Task<IEnumerable<City>> GetCities(int pageNumber = 1, int itemCount = 10)
+        public async Task<PagedList<City>> GetCities(int pageNumber = 1, int itemCount = 10)
         {
             var cityIncludes = new List<Expression<Func<City, object>>>
             {
                 y => y.Country
             };
             var citySpec = new Specification<City>(x => true, cityIncludes);
-            return await cityRepository.GetAsync(citySpec, pageNumber, itemCount);
+            return await cityRepository.GetAsync(citySpec, pageNumber, itemCount, 1, "Id");
         }
     }
 }

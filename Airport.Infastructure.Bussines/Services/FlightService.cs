@@ -1,5 +1,6 @@
 ﻿using Airport.Domain.Core.Entities;
 using Airport.Domain.Core.Intefaces;
+using Airport.Domain.Core.Models;
 using Airport.Domain.Core.Specification;
 using System;
 using System.Collections.Generic;
@@ -37,10 +38,6 @@ namespace Airport.Infastructure.Bussines
         {
             var flightIncludes = new List<Expression<Func<Flights, object>>>
             {
-                y => y.StartAirport.City,
-                y => y.EndAirport.City,
-                y => y.StartAirport,
-                y => y.EndAirport,
                 y => y.StartAirport.City.Country,
                 y => y.EndAirport.City.Country,
             };
@@ -50,7 +47,7 @@ namespace Airport.Infastructure.Bussines
             return await fligthRepository.FindAsync(flightSpec);
         }
 
-        public async Task<IEnumerable<Flights>> GetFlights(int pageNumber = 1, int itemCount = 10)
+        public async Task<PagedList<Flights>> GetFlights(int pageNumber, int itemCount, int sorting,string property, string seacrhData)
         {
             var flightIncludes = new List<Expression<Func<Flights, object>>>
             {
@@ -60,7 +57,12 @@ namespace Airport.Infastructure.Bussines
 
             var flightSpec = new Specification<Flights>(x => true, flightIncludes);
 
-            return await fligthRepository.GetAsync(flightSpec, pageNumber, itemCount);
+            if (!string.IsNullOrWhiteSpace(seacrhData))
+            {
+                 flightSpec = new Specification<Flights>(x => x.StartAirport.Name.ToLower().Contains(seacrhData.ToLower()), flightIncludes);
+            }
+            
+            return await fligthRepository.GetAsync(flightSpec, pageNumber, itemCount, sorting, property);
         }
     }
 }

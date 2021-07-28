@@ -1,4 +1,5 @@
 ﻿using Airport.Domain.Core.Entities;
+using Airport.Domain.Core.Models;
 using Airport.Infastructure.Bussines;
 using AirportsWebApi.Automapper;
 using AirportsWebApi.Models;
@@ -19,15 +20,15 @@ namespace AirportsWebApi.Controllers
         public FlightsController(IFlightService flightService, IMapper mapper)
         {
             this.flightService = flightService;
-            this.mapper = mapper;
+            this.mapper = mapper;   
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FlightVM>>> Get()
+        public async Task<ActionResult<IEnumerable<FlightVM>>> GetFlights( int pageNumber = 1, int sorting = 0, string property = "Id", string seacrhData = "" )
         {
-            var flights = await flightService.GetFlights();
-            var mapped = mapper.Map<Flights, FlightVM>(flights);
-            return Ok(mapped);
+            var serviceFlights = await flightService.GetFlights(pageNumber, 10, sorting, property, seacrhData);
+            var flights = mapper.Map<Flights, FlightVM>(serviceFlights.Items); 
+            return Ok(new { flights, serviceFlights.PagesCount, serviceFlights.TotalItems});
         }
 
         // GET api/users/5

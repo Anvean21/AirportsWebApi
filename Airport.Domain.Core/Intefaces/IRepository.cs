@@ -1,5 +1,6 @@
 ﻿
 using Airport.Domain.Core.Entities;
+using Airport.Domain.Core.Models;
 using Airport.Domain.Core.Specification;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Airport.Domain.Core.Intefaces
 
         Task<TEntity> FindAsync(Specification<TEntity> specification);
 
-        Task<IEnumerable<TEntity>> GetAsync(Specification<TEntity> specification, int pageNumber, int pageSizen);
+        Task<PagedList<TEntity>> GetAsync(Specification<TEntity> specification, int pageNumber, int pageSize, int sorting, string property);
 
         Task AddAsync(TEntity entity);
 

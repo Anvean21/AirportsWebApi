@@ -1,6 +1,8 @@
 ﻿using Airport.Domain.Core.Entities;
 using Airport.Domain.Core.Intefaces;
+using Airport.Domain.Core.Models;
 using Airport.Domain.Core.Specification;
+using Airport.Infrastructure.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -74,11 +76,23 @@ namespace Airport.Infrastructure.Data
             return await includes.FirstOrDefaultAsync(specification.Expression);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAsync(Specification<TEntity> specification, int pageNumber, int pageSize)
+        public async Task<PagedList<TEntity>> GetAsync(Specification<TEntity> specification, int pageNumber, int pageSize, int sorting, string property )
         {
             var includes = Include(specification);
 
-            return await includes.Where(specification.Expression).ToListAsync();
+            if (sorting == 0)
+            {
+                return await includes.Where(specification.Expression).OrderBy(x => x.Id).ToPagedListAsync(pageNumber, pageSize);
+            }
+            else 
+            {
+                //return await includes.Where(specification.Expression)
+                //    .AsEnumerable()//Переключаемя на линкью
+                //    .OrderByDescending(x => x.GetType().GetProperty(property).Name)
+                //    .AsQueryable()
+                //    .ToPagedListAsync(pageNumber, pageSize);
+                return await includes.Where(specification.Expression).OrderByDescending(x => x.Id).ToPagedListAsync(pageNumber, pageSize);
+            }
         }
 
         public async Task RemoveAsync(int entityId)
